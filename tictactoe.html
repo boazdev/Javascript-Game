@@ -1,0 +1,178 @@
+<html>
+    <head>
+        <script>
+            var grid=[[0,0,0],[0,0,0],[0,0,0]]
+            var xTurn = true
+            var moves = []
+            var N=3
+            function startGame()
+            {
+                let tblObj= document.getElementById("gridTbl")
+                while(tblObj.hasChildNodes())
+                    {
+                        tblObj.removeChild(tblObj.firstChild)
+                    }
+                console.log("Start Game Called");
+                for(let i=0;i<3;i++)
+                    {
+                        let trObj =document.createElement("tr");
+                        for(let j=0;j<3;j++)
+                        {
+                            let tdObj = document.createElement("td")
+                            let gstr= "id" +i +j
+                            tdObj.setAttribute("id",gstr)
+                            tdObj.setAttribute("onclick","setSquare(this)")
+                            trObj.appendChild(tdObj)
+                        }
+                        tblObj.appendChild(trObj)
+                    }
+                resetGrid()
+                xTurn=true
+                moves=[]
+                seth2("Player X Turn")
+            }
+
+            function addMoves(i,j)
+            {
+                moves.push([i,j])
+            }
+
+            function deleteLastMove()
+            {
+                if(moves.length==0)
+                    return
+                ijSquare=moves.pop()
+                let i=ijSquare[0]
+                let j=ijSquare[1]
+                let strid="id"+i+j
+                //alert("Clearing Square "+ strid)
+                tdObj=document.getElementById(strid)
+                changexTurn()
+                grid[i][j]=0
+                tdObj.setAttribute("background","")
+            }
+            function seth2(strh)
+            {
+                h2Obj=document.getElementById("alertid")
+                h2Obj.innerText=strh
+            }
+            function setGrid(i,j,isxTurn)
+            {
+                //alert("setGrid"+i+j+ " :" + grid[i][j])
+                if(grid[i][j]!=0)
+                    return false
+                else if (isxTurn)
+                    {
+                        grid[i][j]=2
+                    }
+                else if(!isxTurn)
+                        grid[i][j]=1;
+                return true
+            }
+            function resetGrid()
+            {
+                for(let i=0;i<3;i++)
+                    for(let j=0;j<3;j++)
+                        grid[i][j]=0
+            }
+
+            function setSquare(tdObj)
+            {
+                //alert("Set Square called" + tdObj.id)
+                
+                let i=parseInt(tdObj.id[2])
+                let j=parseInt(tdObj.id[3])
+                //alert("Setting square: " + i +j)
+                isChange=setGrid(i,j,xTurn)
+                if(isChange)
+                    {
+                        if(xTurn)
+                            tdObj.setAttribute("background","x.png")
+                        else
+                            tdObj.setAttribute("background","o.png")
+                    
+                    changexTurn()
+                    
+                    addMoves(i,j)
+                    checkWin(i,j)
+                }
+                
+
+            }
+
+            function checkWin(n,m)
+            {
+                let row= grid[n].reduce((x,y)=> x*y)
+                let col=[grid[0][m],grid[1][m],grid[2][m]].reduce((x,y)=> x*y)
+                let diag1=[grid[0][0],grid[1][1],grid[2][2]].reduce((x,y)=> x*y)
+                let diag2=[grid[0][2],grid[1][1],grid[2][0]].reduce((x,y)=> x*y)
+                if(row ==8 || col==8 || diag1==8 || diag2==8)
+                    seth2("Player X has won!")
+                
+                if(row ==1 || col==1 || diag1==1 || diag2==1)
+                seth2("Player O has won!")
+                /*if(res!=0)
+                    return res*/
+                return false;
+            }
+            function changexTurn()
+            {
+                xTurn=!xTurn
+                if(xTurn)
+                    seth2("Player X Turn")
+                else
+                    seth2("Player O Turn")
+            }
+            function saveGame()
+            {
+                const gridJson = JSON.stringify(grid);
+                alert("Game saved")
+                sessionStorage.setItem("saveGame",gridJson)
+                
+
+            }
+            function loadGame()
+            {
+                //alert("string load game:" +sessionStorage.getItem("saveGame"))
+                let gridSave = JSON.parse(sessionStorage.getItem("saveGame"));
+                alert("Game loaded")
+                startGame()
+                grid=gridSave
+                xTurn=true
+                for(let i=0;i<N;i++)
+                    {
+                        for(let j=0;j<N;j++)
+                            {
+                                
+                                let strid="id"+i+j
+                            //alert("Clearing Square "+ strid)
+                            tdObj=document.getElementById(strid)
+                            if(grid[i][j]==2)
+                                tdObj.setAttribute("background","x.png")
+                            else if(grid[i][j]==1)
+                                tdObj.setAttribute("background","o.png") 
+                                
+                            if(grid[i][j]!=0)
+                                changexTurn()
+                            }
+                    }
+                //alert(gridSave)
+            }
+        </script>
+        <link rel="stylesheet"  href="ttt.css" />
+
+    </head>
+    <body>
+        <hr>
+        <h1>Tic Tac Toe</h1>
+        <hr>
+        <input type="button" value="Start a new game" class="btnClass" onclick="startGame()">
+        <input type="button" value="Delete last move" class="btnClass" onclick="deleteLastMove()">   
+        <input type="button" value="Save game" class="btnClass" onclick="saveGame()">
+        <input type="button" value="Load game" class="btnClass" onclick="loadGame()">
+        <input type="button" value="High Score" class="btnClass">
+        <h2 id="alertid"></h2>
+        <br>
+        <table border="1" id="gridTbl"></table>
+    </body>
+</html>

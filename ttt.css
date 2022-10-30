@@ -1,0 +1,15 @@
+.btnClass{
+    font-size: medium;
+    color:black;
+
+    background-color: greenyellow;
+    text-align: center;
+}
+
+td{
+    width: 200px;
+    height: 200px;
+    background-color: gray;
+    background-size: 100% 100%;
+
+}
